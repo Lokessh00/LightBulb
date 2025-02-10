@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Remote Bulb Controller</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding-top: 50px;
+        }
+        button {
+            margin: 10px;
+            padding: 10px 20px;
+            font-size: 1.2em;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <h1>Remote Bulb Controller</h1>
+    <!-- Buttons for different colors -->
+    <button id="redBtn" style="background-color: red;">Red</button>
+    <button id="greenBtn" style="background-color: green;">Green</button>
+    <button id="yellowBtn" style="background-color: yellow;">Yellow</button>
+    
+    <script>
+        // Replace the URL below with your actual API endpoint when it's ready
+        const apiBaseUrl = 'https://your-api-endpoint.com/api/changeColor';
+
+        document.getElementById('redBtn').addEventListener('click', () => {
+            fetch(`${apiBaseUrl}?color=red`)
+                .then(response => console.log('Red command sent:', response))
+                .catch(error => console.error('Error:', error));
+        });
+
+        document.getElementById('greenBtn').addEventListener('click', () => {
+            fetch(`${apiBaseUrl}?color=green`)
+                .then(response => console.log('Green command sent:', response))
+                .catch(error => console.error('Error:', error));
+        });
+
+        document.getElementById('blueBtn').addEventListener('click', () => {
+            fetch(`${apiBaseUrl}?color=yellow`)
+                .then(response => console.log('Blue command sent:', response))
+                .catch(error => console.error('Error:', error));
+        });
+    </script>
+</body>
+</html>
