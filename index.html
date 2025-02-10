@@ -1,51 +1,172 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Remote Bulb Controller</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-            padding-top: 50px;
-        }
-        button {
-            margin: 10px;
-            padding: 10px 20px;
-            font-size: 1.2em;
-            cursor: pointer;
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cinnamon Mood Game</title>
+  <!-- Include Animate.css for animations -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+  <!-- Google Font for a modern look -->
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    /* Base styling */
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      font-family: 'Montserrat', sans-serif;
+      text-align: center;
+      margin: 0;
+      padding: 40px;
+      transition: background-color 0.8s ease, color 0.8s ease;
+      position: relative;
+    }
+    h1 {
+      margin-bottom: 20px;
+    }
+    #score {
+      font-size: 1.5em;
+      margin: 20px 0;
+    }
+    .button-container {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      margin-bottom: 20px;
+    }
+    .color-btn {
+      border: none;
+      color: white;
+      padding: 20px 40px;
+      font-size: 1.3em;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s, color 0.8s ease;
+    }
+    .color-btn:hover {
+      transform: scale(1.05);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    }
+    #redBtn { background-color: red; }
+    #greenBtn { background-color: green; }
+    #yellowBtn { background-color: goldenrod; }
+    #message {
+      margin-top: 20px;
+      font-size: 1.2em;
+      font-style: italic;
+    }
+    #theme-toggle {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: transparent;
+      border: none;
+      font-size: 2em;
+      cursor: pointer;
+      transition: transform 0.3s;
+      z-index: 1000;
+    }
+    #theme-toggle:hover {
+      transform: scale(1.2);
+    }
+    /* Dark mode variables */
+    body.dark-mode {
+      --bg-color: #121212;
+      --text-color: #f0f0f0;
+    }
+    body.dark-mode #theme-toggle {
+        color: white;
+    }
+    /* Light mode variables */
+    :root {
+      --bg-color: #f0f0f0;
+      --text-color: #333;
+    }
+    .flash-overlay {
+  position: fixed; /* Use fixed positioning to cover the entire viewport */
+  top: 0;
+  left: 0;
+  width: 100vw; /* Full width of the viewport */
+  height: 100vh; /* Full height of the viewport */
+  background-color: transparent;
+  pointer-events: none; /* Prevent the overlay from blocking interactions */
+  z-index: 999;
+  transition: background-color 0.3s ease;
+}
+  </style>
 </head>
 <body>
-    <h1>Remote Bulb Controller</h1>
-    <!-- Buttons for different colors -->
-    <button id="redBtn" style="background-color: red;">Red</button>
-    <button id="greenBtn" style="background-color: green;">Green</button>
-    <button id="yellowBtn" style="background-color: yellow;">Yellow</button>
+  <!-- Flash overlay for background effects -->
+  <div class="flash-overlay" id="flashOverlay"></div>
+
+  <!-- Light/Dark mode toggle button -->
+  <button id="theme-toggle">☀</button>
+  
+  <h1>Cinnamon Mood Game</h1>
+  <p id="score">Score: 0</p>
+  <div class="button-container">
+    <button id="redBtn" class="color-btn">Red</button>
+    <button id="greenBtn" class="color-btn">Green</button>
+    <button id="yellowBtn" class="color-btn">Yellow</button>
+  </div>
+  <p id="message"></p>
+  
+  <script>
+    // Initialize score and select DOM elements
+    let score = 0;
+    const scoreDisplay = document.getElementById('score');
+    const messageDisplay = document.getElementById('message');
+    const flashOverlay = document.getElementById('flashOverlay');
+
+    // Replace with your actual API endpoint when ready
+    const apiBaseUrl = 'https://your-api-endpoint.com/api/changeColor';
     
-    <script>
-        // Replace the URL below with your actual API endpoint when it's ready
-        const apiBaseUrl = 'https://your-api-endpoint.com/api/changeColor';
+    // Function to flash the overlay without affecting the main background
+    function flashBackground(color) {
+      flashOverlay.style.backgroundColor = color;
+      flashOverlay.style.opacity = 0.5;
+      setTimeout(() => {
+        flashOverlay.style.backgroundColor = 'transparent';
+      }, 600);
+    }
 
-        document.getElementById('redBtn').addEventListener('click', () => {
-            fetch(`${apiBaseUrl}?color=red`)
-                .then(response => console.log('Red command sent:', response))
-                .catch(error => console.error('Error:', error));
-        });
+    // Handle color button click events
+    function handleClick(color) {
+      score++;
+      scoreDisplay.textContent = "Score: " + score;
+      
+      const messages = {
+        red: "Red alert! Passion ignites!",
+        green: "Green vibes, pure calm!",
+        yellow: "Yellow sunshine, feel the warmth!"
+      };
+      messageDisplay.textContent = messages[color];
+      
+      const flashColorMap = {
+        red: 'rgba(255, 0, 0, 0.5)',
+        green: 'rgba(0, 128, 0, 0.5)',
+        yellow: 'rgba(255, 255, 0, 0.5)'
+      };
+      flashBackground(flashColorMap[color]);
+      
+      // Send the API command
+      fetch(`${apiBaseUrl}?color=${color}`)
+        .then(response => console.log(color + " command sent:", response))
+        .catch(error => console.error('Error:', error));
+    }
 
-        document.getElementById('greenBtn').addEventListener('click', () => {
-            fetch(`${apiBaseUrl}?color=green`)
-                .then(response => console.log('Green command sent:', response))
-                .catch(error => console.error('Error:', error));
-        });
-
-        document.getElementById('blueBtn').addEventListener('click', () => {
-            fetch(`${apiBaseUrl}?color=yellow`)
-                .then(response => console.log('Blue command sent:', response))
-                .catch(error => console.error('Error:', error));
-        });
-    </script>
+    // Add event listeners to buttons
+    document.getElementById('redBtn').addEventListener('click', () => handleClick('red'));
+    document.getElementById('greenBtn').addEventListener('click', () => handleClick('green'));
+    document.getElementById('yellowBtn').addEventListener('click', () => handleClick('yellow'));
+    
+    // Light/Dark Mode Toggle
+    const themeToggleButton = document.getElementById('theme-toggle');
+    themeToggleButton.addEventListener('click', function() {
+      document.body.classList.toggle('dark-mode');
+      this.textContent = document.body.classList.contains('dark-mode') ? '☾' : '☀';
+      this.classList.add('animate__animated', 'animate__rotateIn');
+      setTimeout(() => this.classList.remove('animate__animated', 'animate__rotateIn'), 800);
+    });
+  </script>
 </body>
 </html>
